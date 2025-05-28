@@ -1,0 +1,16 @@
+[
+  {
+    "title": "title",
+    "description": "descripcion",
+    "code": "code",
+    "price": 123,
+    "status": true,
+    "stock": 1,
+    "category": "category",
+    "thumbnails": [
+      "hola",
+      "hola2"
+    ],
+    "id": "e620f35c-6e66-4a17-8e39-c71e3a4ed055"
+  }
+]
