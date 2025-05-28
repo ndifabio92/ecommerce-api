@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import {
   findById,
-  insertFile,
+  createCart,
   readFile,
   deleteById,
-  updated,
-} from "../../application/useCases/products/productUseCase";
+  addProductToCart
+} from "../../application/useCases/carts/cartsUseCase";
 import { httpResponse } from "../../infrastructure/utils/httpResponse";
 
 export const get = async (req: Request, res: Response) => {
@@ -28,16 +28,17 @@ export const getById = async (req: Request, res: Response) => {
 
 export const post = async (req: Request, res: Response) => {
   try {
-    const result = await insertFile(req.body);
+    const result = await createCart();
     httpResponse.success(res, result);
   } catch (error) {
     console.error("Error details:", error);
   }
 };
 
-export const put = async (req: Request, res: Response) => {
+export const addProduct = async (req: Request, res: Response) => {
   try {
-    const result = await updated(req.params.id, req.body);
+    const { cid, pid } = req.params;
+    const result = await addProductToCart(cid,pid);
     httpResponse.success(res, result);
   } catch (error) {
     console.error("Error details:", error);

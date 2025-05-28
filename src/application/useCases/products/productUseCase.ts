@@ -39,3 +39,18 @@ export const deleteById = async (id: string) => {
   );
   return true;
 };
+
+export const updated = async(id: string, product: Product) => {
+  const products = await readFile();
+  const index = products.findIndex(x => x.id === id);
+  const findProduct = products[index];
+  const updatedProduct: Product = {
+    ...findProduct,
+    ...product,
+    id
+  };
+
+  products[index] = updatedProduct;
+  await SaveIntoFile(PATH, products);
+  return updatedProduct;
+}

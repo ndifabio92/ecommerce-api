@@ -1,15 +1,15 @@
 [
   {
-    "title": "title",
-    "description": "descripcion",
-    "code": "code",
+    "title": "title update",
+    "description": "descripcion update",
+    "code": "code update",
     "price": 123,
     "status": true,
     "stock": 1,
-    "category": "category",
+    "category": "category update",
     "thumbnails": [
-      "hola",
-      "hola2"
+      "hola update",
+      "hola2 update"
     ],
     "id": "e620f35c-6e66-4a17-8e39-c71e3a4ed055"
   }
