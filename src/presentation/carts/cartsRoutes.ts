@@ -1,11 +1,40 @@
-import express from "express";
-import { addProduct, getById, post, remove } from "./cartsController";
+import { Router, RequestHandler } from "express";
+import { CartController } from "./cartsController";
 
-const router = express.Router();
+export class CartRoutes {
+  public router: Router;
 
-router.get("/:id", getById);
-router.post("/", post);
-router.post("/:cid/product/:pid", addProduct);
-router.delete("/:id", remove);
+  constructor(private readonly cartController: CartController) {
+    this.router = Router();
+    this.setupRoutes();
+  }
 
-export default router;
+  private setupRoutes(): void {
+    this.router.get(
+      "/",
+      this.cartController.getAllCarts.bind(
+        this.cartController
+      ) as RequestHandler
+    );
+    this.router.get(
+      "/:id",
+      this.cartController.getCartById.bind(
+        this.cartController
+      ) as RequestHandler
+    );
+    this.router.post(
+      "/",
+      this.cartController.createCart.bind(this.cartController) as RequestHandler
+    );
+    this.router.post(
+      "/:cid/product/:pid",
+      this.cartController.addProductToCart.bind(
+        this.cartController
+      ) as RequestHandler
+    );
+    this.router.delete(
+      "/:id",
+      this.cartController.deleteCart.bind(this.cartController) as RequestHandler
+    );
+  }
+}

@@ -1,10 +1,11 @@
-import { startServer } from "./presentation/server";
+import { server } from "./presentation/server";
 
 const main = async () => {
   try {
-    await startServer();
+    await server.start();
   } catch (error) {
     console.error("Error al iniciar el servidor:", error);
+    process.exit(1);
   }
 };
 

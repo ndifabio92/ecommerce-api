@@ -4,6 +4,9 @@ export const httpResponse = {
   success: (res: Response, data: any, message = "Success") => {
     return res.status(200).json({ success: true, message, data });
   },
+  created: (res: Response, data: any, message = "Created successfully") => {
+    return res.status(201).json({ success: true, message, data });
+  },
   badRequest: (res: Response, message = "Bad Request") => {
     return res.status(400).json({ success: false, message });
   },

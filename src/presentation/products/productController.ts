@@ -1,54 +1,86 @@
 import { Request, Response } from "express";
-import {
-  findById,
-  insertFile,
-  readFile,
-  deleteById,
-  updated,
-} from "../../application/useCases/products/productUseCase";
 import { httpResponse } from "../../infrastructure/utils/httpResponse";
+import { ProductUseCase } from "../../application/use-cases/products/productUseCase";
 
-export const get = async (req: Request, res: Response) => {
-  try {
-    const result = await readFile();
-    httpResponse.success(res, result);
-  } catch (error) {
-    console.error("Error details:", error);
-  }
-};
+export class ProductController {
+  constructor(private readonly productUseCase: ProductUseCase) {}
 
-export const getById = async (req: Request, res: Response) => {
-  try {
-    const result = await findById(req.params.id);
-    httpResponse.success(res, result);
-  } catch (error) {
-    console.error("Error details:", error);
+  async get(_req: Request, res: Response) {
+    try {
+      const products = await this.productUseCase.getAllProducts();
+      httpResponse.success(res, products);
+    } catch (error) {
+      console.error("Error in get:", error);
+      httpResponse.internalServer(res);
+    }
   }
-};
 
-export const post = async (req: Request, res: Response) => {
-  try {
-    const result = await insertFile(req.body);
-    httpResponse.success(res, result);
-  } catch (error) {
-    console.error("Error details:", error);
-  }
-};
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return httpResponse.badRequest(res, "Product ID is required");
+      }
 
-export const put = async (req: Request, res: Response) => {
-  try {
-    const result = await updated(req.params.id, req.body);
-    httpResponse.success(res, result);
-  } catch (error) {
-    console.error("Error details:", error);
+      const product = await this.productUseCase.getProductById(id);
+      if (!product) {
+        return httpResponse.notFound(res, "Product not found");
+      }
+      httpResponse.success(res, product);
+    } catch (error) {
+      console.error("Error in getById:", error);
+      httpResponse.internalServer(res);
+    }
   }
-};
 
-export const remove = async (req: Request, res: Response) => {
-  try {
-    const result = await deleteById(req.params.id);
-    httpResponse.success(res, result);
-  } catch (error) {
-    console.error("Error details:", error);
+  async post(req: Request, res: Response) {
+    try {
+      const productData = req.body;
+      const newProduct = await this.productUseCase.createProduct(productData);
+      httpResponse.created(res, newProduct);
+    } catch (error) {
+      console.error("Error in post:", error);
+      httpResponse.internalServer(res);
+    }
   }
-};
+
+  async put(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return httpResponse.badRequest(res, "Product ID is required");
+      }
+
+      const productData = req.body;
+      const updatedProduct = await this.productUseCase.updateProduct(
+        id,
+        productData
+      );
+      if (!updatedProduct) {
+        return httpResponse.notFound(res, "Product not found");
+      }
+      httpResponse.success(res, updatedProduct);
+    } catch (error) {
+      console.error("Error in put:", error);
+      httpResponse.internalServer(res);
+    }
+  }
+
+  async remove(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return httpResponse.badRequest(res, "Product ID is required");
+      }
+
+      const deleted = await this.productUseCase.deleteProduct(id);
+      if (!deleted) {
+        return httpResponse.notFound(res, "Product not found");
+      }
+      httpResponse.success(res, { message: "Product deleted successfully" });
+    } catch (error) {
+      console.error("Error in remove:", error);
+      httpResponse.internalServer(res);
+    }
+  }
+}

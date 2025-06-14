@@ -28,6 +28,8 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.9",
     "@types/supertest": "^6.0.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
@@ -53,6 +55,8 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.3.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0",
     "valibot": "^1.0.0-rc.2"
   }
