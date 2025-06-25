@@ -51,8 +51,10 @@
     "dotenv": "^16.4.7",
     "env-var": "^7.5.0",
     "express": "^4.21.2",
+    "express-handlebars": "^8.0.2",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.3.0",
+    "socket.io": "^4.8.1",
     "uuid": "^11.1.0",
     "valibot": "^1.0.0-rc.2"
   }
