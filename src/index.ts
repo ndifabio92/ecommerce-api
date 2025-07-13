@@ -1,11 +1,80 @@
-import { startServer } from "./presentation/server";
+import path from "path";
+import http from "http";
+import express, { ErrorRequestHandler } from "express";
+import { connectToDatabase } from "./shared/config/mongodb";
+import { engine } from "express-handlebars";
+import { Server as SocketIOServer } from "socket.io";
+import { envs } from "./shared/config/envs";
+import HomeRouter from "./features/home/infrastructure/routes/HomeRouter";
+import ApiRouter from "./shared/infrastructure/routes/ApiRouter";
+import { ProductSocketController } from "./features/products/infrastructure/controllers/ProductSocketController";
+import { corsMiddleware } from "./shared/infrastructure/middleware/CORS";
+import { errorHandler } from "./shared/infrastructure/middleware/ErrorHandler";
 
-const main = async () => {
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(corsMiddleware);
+app.use("/api/v1", ApiRouter);
+app.use(errorHandler as ErrorRequestHandler);
+
+// Handlebars setup
+app.engine(
+  "handlebars",
+  engine({
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true,
+      allowProtoMethodsByDefault: true,
+    },
+  })
+);
+app.set("view engine", "handlebars");
+app.set(
+  "views",
+  path.join(__dirname, "../src/shared/infrastructure/templates")
+);
+
+// Static files
+app.use(
+  "/js",
+  express.static(path.join(__dirname, "../src/shared/infrastructure/static/js"))
+);
+
+app.use("/", HomeRouter);
+
+// NUEVO: Crear servidor HTTP y Socket.io
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("Cliente conectado:", socket.id);
+  ProductSocketController(io, socket);
+});
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+async function startServer() {
   try {
-    await startServer();
-  } catch (error) {
-    console.error("Error al iniciar el servidor:", error);
-  }
-};
+    await connectToDatabase();
 
-main();
+    app.listen(envs.port, () => {
+      console.log(`🚀 Server running on port ${envs.port}`);
+      console.log(`Health check: http://localhost:${envs.port}/health`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();

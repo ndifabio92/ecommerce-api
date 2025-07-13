@@ -54,6 +54,7 @@
     "express-handlebars": "^8.0.2",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.3.0",
+    "mongoose": "^8.16.2",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0",
     "valibot": "^1.0.0-rc.2"
