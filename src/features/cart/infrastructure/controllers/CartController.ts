@@ -24,7 +24,13 @@ export class CartController {
   async create(req: Request, res: Response) {
     try {
       const cart = await this.createCartUseCase.execute();
-      httpResponse.success(res, cart);
+      const cartObj = {
+        _id: cart.id,
+        products: cart.products,
+        createdAt: cart.createdAt,
+        updatedAt: cart.updatedAt
+      };
+      httpResponse.success(res, cartObj);
     } catch (error) {
       httpResponse.internalServer(res);
     }

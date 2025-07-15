@@ -28,6 +28,17 @@ app.engine(
       allowProtoPropertiesByDefault: true,
       allowProtoMethodsByDefault: true,
     },
+    helpers: {
+      eq: function (a: any, b: any) {
+        return a === b;
+      },
+      gt: function (a: any, b: any) {
+        return a > b;
+      },
+      multiply: function (a: any, b: any) {
+        return (a * b).toFixed(2);
+      }
+    }
   })
 );
 app.set("view engine", "handlebars");
@@ -67,9 +78,10 @@ async function startServer() {
   try {
     await connectToDatabase();
 
-    app.listen(envs.port, () => {
+    server.listen(envs.port, () => {
       console.log(`🚀 Server running on port ${envs.port}`);
       console.log(`Health check: http://localhost:${envs.port}/health`);
+      console.log(`Socket.IO server ready`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);

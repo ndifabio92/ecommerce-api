@@ -37,6 +37,10 @@ const ProductSchema = new Schema<ProductDocument>(
       type: String,
       required: true,
     },
+    status: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

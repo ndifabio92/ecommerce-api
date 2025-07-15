@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{product.title}} - E-commerce</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .product-detail {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .product-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .product-price {
+            font-size: 32px;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .product-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            color: #333;
+            font-size: 16px;
+        }
+        .product-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .product-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .quantity-selector input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .stock-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .in-stock {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .out-of-stock {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛍️ Detalle del Producto</h1>
+    </div>
+
+    {{#if product}}
+        <div class="product-detail">
+            <div class="product-title">{{product.title}}</div>
+            <div class="product-price">${{product.price}}</div>
+            
+            <div class="stock-status {{#if product.stock}}in-stock{{else}}out-of-stock{{/if}}">
+                {{#if product.stock}}
+                    ✅ En Stock ({{product.stock}} disponibles)
+                {{else}}
+                    ❌ Sin Stock
+                {{/if}}
+            </div>
+
+            <div class="product-info">
+                <div class="info-item">
+                    <div class="info-label">Categoría</div>
+                    <div class="info-value">{{product.category}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Código</div>
+                    <div class="info-value">{{product.code}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Stock</div>
+                    <div class="info-value">{{product.stock}} unidades</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ID del Producto</div>
+                    <div class="info-value">{{product._id}}</div>
+                </div>
+            </div>
+
+            <div class="product-description">
+                <div class="info-label">Descripción</div>
+                <div class="info-value">{{product.description}}</div>
+            </div>
+
+            {{#if product.stock}}
+                <div class="quantity-selector">
+                    <label for="quantity">Cantidad:</label>
+                    <input type="number" id="quantity" value="1" min="1" max="{{product.stock}}">
+                </div>
+            {{/if}}
+
+            <div class="product-actions">
+                <a href="/" class="btn btn-secondary">← Volver a Productos</a>
+                {{#if product.stock}}
+                    <button class="btn btn-primary" onclick="addToCart('{{product._id}}')">
+                        🛒 Agregar al Carrito
+                    </button>
+                {{else}}
+                    <button class="btn btn-secondary" disabled>Sin Stock</button>
+                {{/if}}
+            </div>
+        </div>
+    {{else}}
+        <div class="product-detail">
+            <h2>Producto no encontrado</h2>
+            <p>El producto que buscas no existe o ha sido eliminado.</p>
+            <div class="product-actions">
+                <a href="/" class="btn btn-primary">← Volver a Productos</a>
+            </div>
+        </div>
+    {{/if}}
+
+    <div class="back-link">
+        <a href="/">← Volver al inicio</a>
+    </div>
+
+    <script>
+        async function addToCart(productId) {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            try {
+                
+                let cartId = localStorage.getItem('cartId');
+                
+                if (!cartId) {
+                    
+                    const createResponse = await fetch('/api/v1/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const createData = await createResponse.json();
+                    
+                    if (createData.status === 'success') {
+                        cartId = createData.payload._id;
+                        localStorage.setItem('cartId', cartId);
+                    } else {
+                        alert('Error al crear el carrito');
+                        return;
+                    }
+                }
+
+                
+                const response = await fetch(`/api/v1/cart/${cartId}/products/${productId}/${quantity}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert(`¡Producto agregado al carrito exitosamente! (${quantity} unidad${quantity > 1 ? 'es' : ''})`);
+                } else {
+                    alert('Error al agregar el producto al carrito');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error al agregar el producto al carrito');
+            }
+        }
+    </script>
+</body>
+</html> 

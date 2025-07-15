@@ -8,6 +8,7 @@ export class Product {
     public stock: number,
     public category: string,
     public thumbnails: string[],
+    public status: boolean = true,
     public createdAt: Date,
     public updatedAt: Date
   ) {}

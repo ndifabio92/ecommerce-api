@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - E-commerce</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .cart-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .cart-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .cart-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .total-items {
+            color: #666;
+        }
+        .total-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .products-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .product-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .product-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .product-category {
+            color: #666;
+            font-size: 14px;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .subtotal {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .cart-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-cart h3 {
+            margin-bottom: 15px;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .product-image {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Mi Carrito</h1>
+    </div>
+
+    {{#if cart}}
+        <div class="cart-info">
+            <div class="cart-id">Carrito ID: {{cart._id}}</div>
+            <div class="cart-summary">
+                <div class="total-items">
+                    {{#if cart.products.length}}
+                        {{cart.products.length}} producto{{#if (gt cart.products.length 1)}}s{{/if}} en el carrito
+                    {{else}}
+                        Carrito vacío
+                    {{/if}}
+                </div>
+                <div class="total-price">
+                    Total: ${{totalPrice}}
+                </div>
+            </div>
+        </div>
+
+        {{#if cart.products.length}}
+            <div class="products-container">
+                <div class="product-item" style="font-weight: bold; border-bottom: 2px solid #007bff;">
+                    <div>Producto</div>
+                    <div>Precio</div>
+                    <div>Cantidad</div>
+                    <div>Subtotal</div>
+                    <div>Acciones</div>
+                </div>
+                
+                {{#each cart.products}}
+                    <div class="product-item" data-product-id="{{this.id_product._id}}">
+                        <div class="product-info">
+                            <div class="product-title">{{this.id_product.title}}</div>
+                            <div class="product-category">{{this.id_product.category}}</div>
+                        </div>
+                        <div class="product-price">${{this.id_product.price}}</div>
+                        <div class="quantity-controls">
+                            <input type="number" 
+                                   class="quantity-input" 
+                                   value="{{this.quantity}}" 
+                                   min="1" 
+                                   max="{{this.id_product.stock}}"
+                                   onchange="updateQuantity('{{this.id_product._id}}', this.value)">
+                        </div>
+                        <div class="subtotal">${{multiply this.id_product.price this.quantity}}</div>
+                        <div>
+                            <button class="btn btn-danger" onclick="removeProduct('{{this.id_product._id}}')">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+
+            <div class="cart-actions">
+                <a href="/" class="btn btn-secondary">← Seguir Comprando</a>
+                <button class="btn btn-danger" onclick="clearCart()">🗑️ Vaciar Carrito</button>
+                <button class="btn btn-primary" onclick="checkout()">💳 Finalizar Compra</button>
+            </div>
+        {{else}}
+            <div class="empty-cart">
+                <h3>Tu carrito está vacío</h3>
+                <p>¡Agrega algunos productos para comenzar a comprar!</p>
+                <a href="/" class="btn btn-primary">Ver Productos</a>
+            </div>
+        {{/if}}
+    {{else}}
+        <div class="empty-cart">
+            <h3>Carrito no encontrado</h3>
+            <p>El carrito que buscas no existe o ha sido eliminado.</p>
+            <a href="/" class="btn btn-primary">Volver a Productos</a>
+        </div>
+    {{/if}}
+
+    <div class="back-link">
+        <a href="/">← Volver al inicio</a>
+    </div>
+
+    <script>
+        async function updateQuantity(productId, quantity) {
+            try {
+                const response = await fetch(`/api/v1/cart/{{cart._id}}/products/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: parseInt(quantity) })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Error al actualizar la cantidad');
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                alert('Error al actualizar la cantidad');
+            }
+        }
+
+        async function removeProduct(productId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/cart/{{cart._id}}/products/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Error al eliminar el producto');
+                }
+            } catch (error) {
+                console.error('Error removing product:', error);
+                alert('Error al eliminar el producto');
+            }
+        }
+
+        async function clearCart() {
+            if (!confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/cart/{{cart._id}}/clear`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Error al vaciar el carrito');
+                }
+            } catch (error) {
+                console.error('Error clearing cart:', error);
+                alert('Error al vaciar el carrito');
+            }
+        }
+
+        function checkout() {
+            alert('¡Funcionalidad de checkout en desarrollo! 🚧');
+        }
+    </script>
+</body>
+</html> 

@@ -1,18 +1,248 @@
-<h1>Lista de productos en tiempo real</h1>
-<ul id="product-list">
-  {{#each products}}
-    <li data-id="{{this.id}}">{{this.title}} - ${{this.price}}
-      <button onclick="deleteProduct('{{this.id}}')">Eliminar</button>
-    </li>
-  {{/each}}
-</ul>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealTime Products - E-commerce</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .products-section, .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .product-details {
+            color: #666;
+            font-size: 14px;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔄 RealTime Products</h1>
+        <p>Gestiona productos en tiempo real</p>
+    </div>
 
-<h2>Agregar producto</h2>
-<form id="add-product-form">
-  <input type="text" id="title" placeholder="Título" required>
-  <input type="number" id="price" placeholder="Precio" required>
-  <button type="submit">Agregar</button>
-</form>
+    <div class="container">
+        <div class="products-section">
+            <h2>📦 Lista de Productos</h2>
+            <div id="product-list">
+                {{#if products.length}}
+                    {{#each products}}
+                        <div class="product-item" data-id="{{this._id}}">
+                            <div class="product-info">
+                                <div class="product-title">{{this.title}}</div>
+                                <div class="product-details">
+                                    Categoría: {{this.category}} | Stock: {{this.stock}} | Código: {{this.code}}
+                                </div>
+                                <div class="status-indicator {{#if this.status}}status-active{{else}}status-inactive{{/if}}">
+                                    {{#if this.status}}✅ Activo{{else}}❌ Inactivo{{/if}}
+                                </div>
+                            </div>
+                            <div class="product-price">${{this.price}}</div>
+                            <button class="btn btn-danger" onclick="deleteProduct('{{this._id}}')">🗑️ Eliminar</button>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <div class="no-products">
+                        <h3>No hay productos</h3>
+                        <p>Agrega tu primer producto usando el formulario</p>
+                    </div>
+                {{/if}}
+            </div>
+        </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/realtime.js"></script>
+        <div class="form-section">
+            <h2>➕ Agregar Producto</h2>
+            <form id="add-product-form">
+                <div class="form-group">
+                    <label for="title">Título *</label>
+                    <input type="text" id="title" placeholder="Nombre del producto" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descripción *</label>
+                    <textarea id="description" placeholder="Descripción detallada del producto" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="code">Código *</label>
+                        <input type="text" id="code" placeholder="Código único del producto" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Categoría *</label>
+                        <input type="text" id="category" placeholder="Electrónicos, Ropa, etc." required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Precio *</label>
+                        <input type="number" id="price" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock *</label>
+                        <input type="number" id="stock" placeholder="0" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Estado</label>
+                    <select id="status">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="thumbnails">URLs de Imágenes</label>
+                    <textarea id="thumbnails" placeholder="https://ejemplo.com/imagen1.jpg&#10;https://ejemplo.com/imagen2.jpg"></textarea>
+                    <small>Una URL por línea (opcional)</small>
+                </div>
+
+                <button type="submit" class="submit-btn">➕ Agregar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="/">← Volver al inicio</a>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/realtime.js"></script>
+</body>
+</html>

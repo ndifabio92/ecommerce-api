@@ -3,6 +3,7 @@ import { PaginationParamsDto } from "../../../../shared/application/dtos/Paginat
 import { BuildUrl } from "../../../../shared/infrastructure/utils/BuildUrl";
 import { Pagination } from "../../../../shared/infrastructure/utils/Pagination";
 import { CreateProductDto } from "../../application/dtos/CreateProductDto";
+import { ProductDetailViewDto } from "../../application/dtos/ProductDetailViewDto";
 import { Product } from "../../domain/entities/Product";
 import { IProductRepository } from "../../domain/repositories/IProductRepository";
 import { ProductModel } from "../models/ProductModel";
@@ -106,5 +107,24 @@ export class MongoProductRepository implements IProductRepository {
     } catch (error) {
       return false;
     }
+  }
+
+  //VIEW
+  async findByIdForView(id: string): Promise<ProductDetailViewDto | null> {
+    const product = await ProductModel.findById(id).lean();
+    if (!product) return null;
+    return {
+      id: product._id.toString(),
+      title: product.title,
+      description: product.description,
+      code: product.code,
+      price: product.price,
+      stock: product.stock,
+      category: product.category,
+      thumbnails: product.thumbnails,
+      status: product.status,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    };
   }
 }

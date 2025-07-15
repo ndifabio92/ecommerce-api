@@ -1,3 +1,4 @@
+import { CartDetailViewDto } from "../../application/dtos/CartDetailViewDto";
 import { Cart } from "../../domain/entities/Cart";
 import { CartProduct } from "../../domain/entities/CartProduct";
 import { ICartRepository } from "../../domain/repositories/ICartRepository";
@@ -183,7 +184,7 @@ export class MongoCartRepository implements ICartRepository {
         (product: any) =>
           new CartProduct(
             product.id_product._id
-              ? product.id_product._id.toString()
+              ? product.id_product
               : product.id_product.toString(),
             product.quantity
           )
@@ -191,5 +192,35 @@ export class MongoCartRepository implements ICartRepository {
       cartDoc.createdAt,
       cartDoc.updatedAt
     );
+  }
+
+  //VIEW
+  async findByIdForView(id: string): Promise<CartDetailViewDto | null> {
+    const cart = await CartModel.findById(id)
+      .populate("products.id_product")
+      .lean();
+    if (!cart) return null;
+    const products = (cart.products || []).map((item: any) => {
+      const prod = item.id_product;
+      return {
+        id: prod._id.toString(),
+        title: prod.title,
+        price: prod.price,
+        quantity: item.quantity,
+        category: prod.category,
+        thumbnails: prod.thumbnails || [],
+      };
+    });
+    const totalPrice = products.reduce(
+      (acc, p) => acc + p.price * p.quantity,
+      0
+    );
+    return {
+      id: cart._id.toString(),
+      products,
+      totalPrice,
+      createdAt: cart.createdAt,
+      updatedAt: cart.updatedAt,
+    };
   }
 }

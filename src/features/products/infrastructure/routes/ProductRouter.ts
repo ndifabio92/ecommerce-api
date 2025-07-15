@@ -26,9 +26,7 @@ const productController = new ProductController(
 );
 
 ProductRouter.post("/", (req, res) => productController.create(req, res));
-ProductRouter.get("/?limit=10&page=1&sort=asc&query=search", (req, res) =>
-  productController.getAll(req, res)
-);
+ProductRouter.get("/", (req, res) => productController.getAll(req, res));
 ProductRouter.get("/:id", (req, res) => productController.getById(req, res));
 ProductRouter.put("/:id", (req, res) => productController.update(req, res));
 ProductRouter.delete("/:id", (req, res) => productController.delete(req, res));

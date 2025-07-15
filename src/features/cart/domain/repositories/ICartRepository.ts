@@ -1,3 +1,4 @@
+import { CartDetailViewDto } from "../../application/dtos/CartDetailViewDto";
 import { Cart } from "../entities/Cart";
 import { CartProduct } from "../entities/CartProduct";
 
@@ -18,4 +19,7 @@ export interface ICartRepository {
   ): Promise<Cart>;
   delete(id: string): Promise<boolean>;
   clearCart(id: string): Promise<Cart>;
+
+  //VIEW
+  findByIdForView(id: string): Promise<CartDetailViewDto | null>;
 }

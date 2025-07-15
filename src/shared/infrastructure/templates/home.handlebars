@@ -1,7 +1,296 @@
-<h1>Lista de productos (Home)</h1>
-<ul>
-  {{#each products}}
-    <li>{{this.title}} - ${{this.price}}</li>
-  {{/each}}
-</ul>
-<a href="/realtimeproducts">Ir a RealTime Products</a>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce - Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filters form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .filters button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .product-price {
+            font-size: 20px;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .product-category {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #007bff;
+            border-radius: 4px;
+        }
+        .pagination .current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .pagination .disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .cart-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛍️ E-commerce - Productos</h1>
+        <p>Explora nuestra colección de productos</p>
+    </div>
+
+    <div class="cart-info">
+        <strong>🛒 Carrito:</strong> 
+        <span id="cart-id">{{#if cartId}}{{cartId}}{{else}}No creado{{/if}}</span>
+        <button class="btn btn-secondary" onclick="createCart(event)">Crear Carrito</button>
+        {{#if cartId}}
+            <a href="/carts/{{cartId}}" class="btn btn-primary">Ver Carrito</a>
+        {{/if}}
+    </div>
+
+    <div class="filters">
+        <form method="GET" action="/">
+            <input type="text" name="query" placeholder="Buscar productos..." value="{{query}}">
+            <select name="sort">
+                <option value="">Sin ordenar</option>
+                <option value="asc" {{#if (eq sort "asc")}}selected{{/if}}>Precio: Menor a Mayor</option>
+                <option value="desc" {{#if (eq sort "desc")}}selected{{/if}}>Precio: Mayor a Menor</option>
+            </select>
+            <input type="number" name="limit" placeholder="Límite" value="{{limit}}" min="1" max="50">
+            <button type="submit">Filtrar</button>
+        </form>
+    </div>
+
+    {{#if products.length}}
+        <div class="products-grid">
+            {{#each products}}
+                <div class="product-card">
+                    <div class="product-title">{{this.title}}</div>
+                    <div class="product-price">${{this.price}}</div>
+                    <div class="product-category">Categoría: {{this.category}}</div>
+                    <div class="product-actions">
+                        <a href="/products/{{this._id}}" class="btn btn-secondary">Ver Detalles</a>
+                        <button class="btn btn-primary" onclick="addToCart('{{this._id}}')">Agregar al Carrito</button>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+
+        {{#if pagination}}
+            <div class="pagination">
+                {{#if pagination.hasPrevPage}}
+                    <a href="{{pagination.prevLink}}">← Anterior</a>
+                {{else}}
+                    <span class="disabled">← Anterior</span>
+                {{/if}}
+
+                <span class="current">Página {{pagination.page}} de {{pagination.totalPages}}</span>
+
+                {{#if pagination.hasNextPage}}
+                    <a href="{{pagination.nextLink}}">Siguiente →</a>
+                {{else}}
+                    <span class="disabled">Siguiente →</span>
+                {{/if}}
+            </div>
+        {{/if}}
+    {{else}}
+        <div class="no-products">
+            <h3>No se encontraron productos</h3>
+            <p>Intenta con otros filtros de búsqueda</p>
+        </div>
+    {{/if}}
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/realtimeproducts" class="btn btn-secondary">Ir a RealTime Products</a>
+    </div>
+
+    <script>
+        async function createCart(event) {
+            try {
+                const response = await fetch('/api/v1/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                const newCartId = (data.payload && (data.payload._id || data.payload.id)) ||
+                                  (data.data && (data.data._id || data.data.id));
+                if ((data.status === 'success' || data.success === true) && newCartId) {
+                    localStorage.setItem('cartId', newCartId);
+                    document.getElementById('cart-id').textContent = newCartId;
+                    const cartInfo = document.querySelector('.cart-info');
+                    if (!cartInfo.querySelector('a[href*="/carts/"]')) {
+                        const viewCartBtn = document.createElement('a');
+                        viewCartBtn.href = `/carts/${newCartId}`;
+                        viewCartBtn.className = 'btn btn-primary';
+                        viewCartBtn.textContent = 'Ver Carrito';
+                        viewCartBtn.style.marginLeft = '10px';
+                        cartInfo.appendChild(viewCartBtn);
+                    }
+
+                    if (event && event.target) {
+                        event.target.style.display = 'none';
+                    }
+                    alert('Carrito creado exitosamente!');
+                } else {
+                    alert('No se pudo obtener el ID del carrito');
+                }
+            } catch (error) {
+                console.error('Error creating cart:', error);
+                alert('Error al crear el carrito');
+            }
+        }
+
+        async function addToCart(productId) {
+            let cartId = localStorage.getItem('cartId') || document.getElementById('cart-id').textContent.trim();
+            if (!cartId || cartId === 'No creado') {
+                alert('Primero debes crear un carrito');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/cart/${cartId}/products/${productId}/1`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success' || data.success === true) {
+                    alert('Producto agregado al carrito exitosamente');
+                } else {
+                    alert('Error al agregar el producto al carrito');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error al agregar el producto al carrito');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCartId = localStorage.getItem('cartId');
+            if (savedCartId) {
+                document.getElementById('cart-id').textContent = savedCartId;
+                const cartInfo = document.querySelector('.cart-info');
+                if (!cartInfo.querySelector('a[href*="/carts/"]')) {
+                    const viewCartBtn = document.createElement('a');
+                    viewCartBtn.href = `/carts/${savedCartId}`;
+                    viewCartBtn.className = 'btn btn-primary';
+                    viewCartBtn.textContent = 'Ver Carrito';
+                    viewCartBtn.style.marginLeft = '10px';
+                    cartInfo.appendChild(viewCartBtn);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
