@@ -8,6 +8,7 @@ import { envs } from "./shared/config/envs";
 import HomeRouter from "./features/home/infrastructure/routes/HomeRouter";
 import ApiRouter from "./shared/infrastructure/routes/ApiRouter";
 import { ProductSocketController } from "./features/products/infrastructure/controllers/ProductSocketController";
+import { CartSocketController } from "./features/cart/infrastructure/controllers/CartSocketController";
 import { corsMiddleware } from "./shared/infrastructure/middleware/CORS";
 import { errorHandler } from "./shared/infrastructure/middleware/ErrorHandler";
 
@@ -37,8 +38,8 @@ app.engine(
       },
       multiply: function (a: any, b: any) {
         return (a * b).toFixed(2);
-      }
-    }
+      },
+    },
   })
 );
 app.set("view engine", "handlebars");
@@ -67,6 +68,7 @@ const io = new SocketIOServer(server, {
 io.on("connection", (socket) => {
   console.log("Cliente conectado:", socket.id);
   ProductSocketController(io, socket);
+  CartSocketController(io, socket);
 });
 
 // Health check endpoint

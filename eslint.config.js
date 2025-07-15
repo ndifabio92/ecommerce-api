@@ -8,42 +8,42 @@ import airbnbBaseTypescript from "eslint-config-airbnb-base-typescript";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-	js.configs.recommended,
-	{
-		files: ["**/*.{js,mjs,cjs,ts}"],
-		languageOptions: {
-			parser: tsParser,
-			globals: {
-				...globals.browser,
-				...globals.node,
-			},
-		},
-		plugins: {
-			"@typescript-eslint": tseslint,
-			"unused-imports": unusedImports,
-		},
-		rules: {
-			...airbnbBase.rules,
-			...airbnbBaseTypescript.rules,
-			"no-unused-vars": "off",
-			"unused-imports/no-unused-vars": [
-				"warn",
-				{
-					vars: "all",
-					varsIgnorePattern: "^_",
-					args: "after-used",
-					argsIgnorePattern: "^_",
-					caughtErrors: "all",
-					caughtErrorsIgnorePattern: "^_",
-				},
-			],
-		},
-		settings: {
-			"import/resolver": {
-				node: {
-					extensions: [".js", ".jsx", ".ts", ".tsx"],
-				},
-			},
-		},
-	},
+  js.configs.recommended,
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    languageOptions: {
+      parser: tsParser,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      "@typescript-eslint": tseslint,
+      "unused-imports": unusedImports,
+    },
+    rules: {
+      ...airbnbBase.rules,
+      ...airbnbBaseTypescript.rules,
+      "no-unused-vars": "off",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
+    settings: {
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
+    },
+  },
 ];

@@ -11,4 +11,4 @@ export interface CartDetailViewDto {
   totalPrice: number;
   createdAt: Date;
   updatedAt: Date;
-} 
+}

@@ -28,7 +28,7 @@ export class CartController {
         _id: cart.id,
         products: cart.products,
         createdAt: cart.createdAt,
-        updatedAt: cart.updatedAt
+        updatedAt: cart.updatedAt,
       };
       httpResponse.success(res, cartObj);
     } catch (error) {
