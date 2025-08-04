@@ -1,3 +1,4 @@
+import { Product } from "../../../products/domain/entities/Product";
 import { CartDetailViewDto } from "../../application/dtos/CartDetailViewDto";
 import { Cart } from "../../domain/entities/Cart";
 import { CartProduct } from "../../domain/entities/CartProduct";
