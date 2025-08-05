@@ -1,6 +1,7 @@
 import path from "path";
 import http from "http";
 import express, { ErrorRequestHandler } from "express";
+import passport from "passport";
 import { connectToDatabase } from "./shared/config/mongodb";
 import { engine } from "express-handlebars";
 import { Server as SocketIOServer } from "socket.io";
@@ -11,6 +12,8 @@ import { ProductSocketController } from "./features/products/infrastructure/cont
 import { CartSocketController } from "./features/cart/infrastructure/controllers/CartSocketController";
 import { corsMiddleware } from "./shared/infrastructure/middleware/CORS";
 import { errorHandler } from "./shared/infrastructure/middleware/ErrorHandler";
+// Importar configuración de Passport
+import "./features/auth/infrastructure/strategies/PassportConfig";
 
 const app = express();
 
@@ -18,6 +21,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(corsMiddleware);
+
+// Inicializar Passport
+app.use(passport.initialize());
+
 app.use("/api/v1", ApiRouter);
 app.use(errorHandler as ErrorRequestHandler);
 

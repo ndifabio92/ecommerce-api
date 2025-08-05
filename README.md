@@ -4,6 +4,16 @@ API de e-commerce desarrollada con Node.js, Express, TypeScript y MongoDB, sigui
 
 ## 🚀 Características Implementadas
 
+### ✅ **Sistema de Autenticación y Autorización JWT**
+
+- **CRUD Completo de Usuarios**: Crear, leer, actualizar y eliminar usuarios
+- **Autenticación JWT**: Login con email y contraseña
+- **Encriptación de Contraseñas**: Usando bcrypt con hashSync
+- **Estrategias de Passport**: JWT Strategy y estrategia "current"
+- **Middleware de Autenticación**: Protección de rutas con tokens
+- **Roles de Usuario**: USER y ADMIN
+- **Validación de Tokens**: Endpoint `/api/v1/sessions/current`
+
 ### ✅ **Productos con Paginación Avanzada**
 
 - **Filtros**: Búsqueda por título, descripción y categoría
@@ -51,6 +61,23 @@ PUT    /api/v1/cart/:id                    # Actualizar todos los productos
 PUT    /api/v1/cart/:id/products/:pid      # Actualizar cantidad de producto
 DELETE /api/v1/cart/:id/clear              # Vaciar carrito
 DELETE /api/v1/cart/:id                    # Eliminar carrito
+```
+
+### Autenticación
+
+```
+POST   /api/v1/sessions/login              # Login de usuario (email/password)
+GET    /api/v1/sessions/current            # Obtener usuario actual (requiere token)
+```
+
+### Usuarios
+
+```
+GET    /api/v1/users                       # Listar todos los usuarios
+GET    /api/v1/users/:id                   # Obtener usuario por ID
+POST   /api/v1/users                       # Crear nuevo usuario
+PUT    /api/v1/users/:id                   # Actualizar usuario
+DELETE /api/v1/users/:id                   # Eliminar usuario
 ```
 
 ### Vistas Web
@@ -210,10 +237,60 @@ npm start
 DEVELOPMENT=true
 CORS_ORIGIN=http://localhost:3000,http://example.com
 MONGODB_URI=mongodb://localhost:27017/ecommerce
+JWT_SECRET=tu-clave-secreta-jwt-muy-segura
 PORT=8080
 ```
 
 ## 🔍 Ejemplos de Uso
+
+### Sistema de Autenticación
+
+```bash
+# 1. Login de usuario (obtener token JWT)
+curl -X POST http://localhost:8080/api/v1/sessions/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@ecommerce.com",
+    "password": "admin123"
+  }'
+
+# 2. Obtener usuario actual (requiere token)
+curl -X GET http://localhost:8080/api/v1/sessions/current \
+  -H "Authorization: Bearer [tu-token-jwt]"
+```
+
+### CRUD de Usuarios
+
+```bash
+# 1. Crear nuevo usuario
+curl -X POST http://localhost:8080/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Juan",
+    "last_name": "Pérez",
+    "email": "juan@example.com",
+    "age": 28,
+    "password": "password123",
+    "role": "user"
+  }'
+
+# 2. Obtener todos los usuarios
+curl -X GET http://localhost:8080/api/v1/users
+
+# 3. Obtener usuario por ID
+curl -X GET http://localhost:8080/api/v1/users/[user-id]
+
+# 4. Actualizar usuario
+curl -X PUT http://localhost:8080/api/v1/users/[user-id] \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Juan Carlos",
+    "age": 29
+  }'
+
+# 5. Eliminar usuario
+curl -X DELETE http://localhost:8080/api/v1/users/[user-id]
+```
 
 ### Crear un carrito y agregar productos
 
@@ -234,3 +311,18 @@ curl -X GET http://localhost:8080/api/v1/cart/[cart-id]
 # Buscar productos de electrónica, ordenados por precio ascendente
 curl -X GET "http://localhost:8080/api/v1/products?query=electronics&sort=asc&limit=5&page=1"
 ```
+
+### Usuarios por Defecto
+
+Al iniciar el servidor, se crean automáticamente:
+
+- **Administrador**:
+
+  - Email: `admin@ecommerce.com`
+  - Password: `admin123`
+  - Role: `admin`
+
+- **Usuario Normal**:
+  - Email: `user@ecommerce.com`
+  - Password: `user123`
+  - Role: `user`
