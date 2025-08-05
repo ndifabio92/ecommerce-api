@@ -9,7 +9,7 @@ import { UpdateCartProductsUseCase } from "../../application/use-cases/UpdateCar
 import { ClearCartUseCase } from "../../application/use-cases/ClearCartUseCase";
 import { DeleteCartUseCase } from "../../application/use-cases/DeleteCartUseCase";
 import { UpdateProductQuantityUseCase } from "../../application/use-cases/UpdateProductQuantityUseCase";
-import { AuthUser } from "../../../auth/infrastructure/middleware/Auth";
+import { AuthUser } from "../../../auth/infrastructure/middleware/AuthMiddleware";
 
 // Dependency injection
 const CartRouter = Router();

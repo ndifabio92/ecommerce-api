@@ -9,7 +9,7 @@ type AuthOptions = {
   optional?: boolean;
 };
 
-export const Auth = (options: AuthOptions = {}) => {
+export const AuthMiddleware = (options: AuthOptions = {}) => {
   const { roles = [UserRole.USER, UserRole.ADMIN], optional = false } = options;
 
   const authRepository = new JwtAuthRepository();
@@ -57,7 +57,7 @@ export const Auth = (options: AuthOptions = {}) => {
   };
 };
 
-export const AuthUser = () => Auth({ roles: [UserRole.USER] });
-export const AuthAdmin = () => Auth({ roles: [UserRole.ADMIN] });
-export const AuthAny = () => Auth();
-export const AuthOptional = () => Auth({ optional: true });
+export const AuthUser = () => AuthMiddleware({ roles: [UserRole.USER] });
+export const AuthAdmin = () => AuthMiddleware({ roles: [UserRole.ADMIN] });
+export const AuthAny = () => AuthMiddleware();
+export const AuthOptional = () => AuthMiddleware({ optional: true });
