@@ -7,5 +7,5 @@ export const envs = {
   corsOrigin:
     get("CORS_ORIGIN").required().asString() || "http://localhost:8080",
   mongoDbUri: get("MONGODB_URI").required().asString(),
-  jwtSecret: get("JWT_SECRET").asString() || "your-jwt-secret-key",
+  jwtSecret: get("JWT_SECRET").required().asString(),
 };

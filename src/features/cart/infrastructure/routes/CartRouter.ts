@@ -9,7 +9,7 @@ import { UpdateCartProductsUseCase } from "../../application/use-cases/UpdateCar
 import { ClearCartUseCase } from "../../application/use-cases/ClearCartUseCase";
 import { DeleteCartUseCase } from "../../application/use-cases/DeleteCartUseCase";
 import { UpdateProductQuantityUseCase } from "../../application/use-cases/UpdateProductQuantityUseCase";
-import { requireUserRole } from "../../../auth/infrastructure/middleware/RoleMiddleware";
+import { AuthUser } from "../../../auth/infrastructure/middleware/Auth";
 
 // Dependency injection
 const CartRouter = Router();
@@ -43,7 +43,7 @@ CartRouter.get("/:id", (req, res) => {
   cartController.getById(req, res);
 });
 
-CartRouter.post("/", requireUserRole(), (req, res) => {
+CartRouter.post("/", AuthUser(), (req, res) => {
   cartController.create(req, res);
 });
 

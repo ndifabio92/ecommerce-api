@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
 import { Auth } from "../../domain/entities/Auth";
 import { User } from "../../../users/domain/entities/User";
@@ -7,7 +7,7 @@ import { UserModel } from "../../../users/infrastructure/models/UserModel";
 import { envs } from "../../../../shared/config/envs";
 
 export class JwtAuthRepository implements IAuthRepository {
-  private readonly JWT_SECRET = envs.jwtSecret || "your-secret-key";
+  private readonly JWT_SECRET = envs.jwtSecret;
   private readonly SALT_ROUNDS = 10;
 
   async login(email: string, password: string): Promise<Auth> {
@@ -58,9 +58,9 @@ export class JwtAuthRepository implements IAuthRepository {
         last_name: user.last_name,
         email: user.email,
         age: user.age,
-        password: user.password,
         cart: user.cart,
         role: user.role,
+        password: "",
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };
