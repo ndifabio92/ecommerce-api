@@ -23,7 +23,10 @@ export class CartController {
 
   async create(req: Request, res: Response) {
     try {
-      const cart = await this.createCartUseCase.execute();
+      const user = (req as any).user;
+      const userId = user.id;
+
+      const cart = await this.createCartUseCase.execute(userId);
       const cartObj = {
         _id: cart.id,
         products: cart.products,

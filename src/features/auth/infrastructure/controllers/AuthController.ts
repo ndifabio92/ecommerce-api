@@ -24,7 +24,6 @@ export class AuthController {
       if (!user) {
         return httpResponse.unauthorized(res);
       }
-      // No devolvemos la contraseña en la respuesta
       const { password, ...userWithoutPassword } = user;
       httpResponse.success(res, userWithoutPassword);
     } catch (error) {

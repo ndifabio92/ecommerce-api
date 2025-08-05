@@ -12,7 +12,6 @@ import { ProductSocketController } from "./features/products/infrastructure/cont
 import { CartSocketController } from "./features/cart/infrastructure/controllers/CartSocketController";
 import { corsMiddleware } from "./shared/infrastructure/middleware/CORS";
 import { errorHandler } from "./shared/infrastructure/middleware/ErrorHandler";
-// Importar configuración de Passport
 import "./features/auth/infrastructure/strategies/PassportConfig";
 
 const app = express();

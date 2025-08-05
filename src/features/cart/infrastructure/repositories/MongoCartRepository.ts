@@ -4,11 +4,19 @@ import { Cart } from "../../domain/entities/Cart";
 import { CartProduct } from "../../domain/entities/CartProduct";
 import { ICartRepository } from "../../domain/repositories/ICartRepository";
 import { CartModel } from "../models/CartModel";
+import { UserModel } from "../../../users/infrastructure/models/UserModel";
 
 export class MongoCartRepository implements ICartRepository {
-  async create(): Promise<Cart> {
+  async create(userId?: string): Promise<Cart> {
     try {
       const cartDoc = await CartModel.create({ products: [] });
+
+      if (userId) {
+        await UserModel.findByIdAndUpdate(userId, {
+          cart: cartDoc._id,
+        });
+      }
+
       return this.mapToEntity(cartDoc);
     } catch (error) {
       throw new Error(`Error creating cart: ${error}`);

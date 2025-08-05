@@ -12,7 +12,7 @@ passport.use(
   "jwt",
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await UserModel.findById(payload.id);
+      const user = await UserModel.findById(payload.id).populate("cart");
       if (user) {
         return done(null, {
           id: (user as any)._id.toString(),
@@ -21,7 +21,7 @@ passport.use(
           email: user.email,
           age: user.age,
           password: user.password,
-          cart: user.cart?.toString(),
+          cart: user.cart,
           role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -34,12 +34,11 @@ passport.use(
   })
 );
 
-// Estrategia "current" para validar token y extraer usuario
 passport.use(
   "current",
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await UserModel.findById(payload.id);
+      const user = await UserModel.findById(payload.id).populate("cart");
       if (user) {
         return done(null, {
           id: (user as any)._id.toString(),
@@ -48,7 +47,7 @@ passport.use(
           email: user.email,
           age: user.age,
           password: user.password,
-          cart: user.cart?.toString(),
+          cart: user.cart,
           role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,

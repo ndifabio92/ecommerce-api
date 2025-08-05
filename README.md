@@ -23,11 +23,16 @@ API de e-commerce desarrollada con Node.js, Express, TypeScript y MongoDB, sigui
 
 ### ✅ **Gestión Completa de Carritos**
 
-- Crear carrito
+- Crear carrito (requiere autenticación con rol USER)
+- **Asignación Automática**: El carrito se asigna automáticamente al usuario autenticado
 - Agregar productos al carrito
 - Eliminar productos del carrito
 - Actualizar cantidades
 - Vaciar carrito
+- Eliminar carrito completo
+- **Populate**: Los productos se muestran completos con toda su información
+- **Seguridad**: Solo usuarios autenticados con rol USER pueden crear carritos
+- **Relación User-Cart**: El campo `cart` del usuario se actualiza automáticamente
 - Eliminar carrito completo
 - **Populate**: Los productos se muestran completos con toda su información
 
@@ -54,7 +59,7 @@ DELETE /api/v1/products/:id                # Eliminar producto
 
 ```
 GET    /api/v1/cart/:id                    # Obtener carrito por ID
-POST   /api/v1/cart                        # Crear carrito
+POST   /api/v1/cart                        # Crear carrito (requiere auth + rol USER)
 POST   /api/v1/cart/:id/products/:pid/:qty # Agregar producto al carrito
 DELETE /api/v1/cart/:id/products/:pid      # Eliminar producto del carrito
 PUT    /api/v1/cart/:id                    # Actualizar todos los productos
@@ -67,7 +72,8 @@ DELETE /api/v1/cart/:id                    # Eliminar carrito
 
 ```
 POST   /api/v1/sessions/login              # Login de usuario (email/password)
-GET    /api/v1/sessions/current            # Obtener usuario actual (requiere token)
+GET    /api/v1/sessions/current            # Obtener usuario actual (Passport JWT)
+GET    /api/v1/sessions/current-direct     # Obtener usuario actual (ValidateTokenUseCase)
 ```
 
 ### Usuarios
@@ -295,14 +301,48 @@ curl -X DELETE http://localhost:8080/api/v1/users/[user-id]
 ### Crear un carrito y agregar productos
 
 ```bash
-# 1. Crear carrito
-curl -X POST http://localhost:8080/api/v1/cart
+# 1. Primero hacer login para obtener el token
+curl -X POST http://localhost:8080/api/v1/sessions/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@ecommerce.com",
+    "password": "user123"
+  }'
 
-# 2. Agregar producto al carrito
+# 2. Crear carrito (requiere token de usuario con rol USER)
+# El carrito se asigna automáticamente al usuario autenticado
+curl -X POST http://localhost:8080/api/v1/cart \
+  -H "Authorization: Bearer [tu-token-jwt]"
+
+# 3. Agregar producto al carrito
 curl -X POST http://localhost:8080/api/v1/cart/[cart-id]/products/[product-id]/2
 
-# 3. Ver carrito con productos populados
+# 4. Ver carrito con productos populados
 curl -X GET http://localhost:8080/api/v1/cart/[cart-id]
+
+# 5. Verificar que el usuario ahora tiene el cart asignado
+curl -X GET http://localhost:8080/api/v1/sessions/current \
+  -H "Authorization: Bearer [tu-token-jwt]"
+```
+
+### Flujo Completo: Usuario → Cart → Usuario Actualizado
+
+```bash
+# 1. Login inicial - usuario sin cart
+curl -X POST http://localhost:8080/api/v1/sessions/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@ecommerce.com", "password": "user123"}'
+# Respuesta: user.cart = null
+
+# 2. Crear carrito con token del usuario
+curl -X POST http://localhost:8080/api/v1/cart \
+  -H "Authorization: Bearer [token]"
+# El cart se crea y se asigna al usuario automáticamente
+
+# 3. Verificar usuario actualizado
+curl -X GET http://localhost:8080/api/v1/sessions/current \
+  -H "Authorization: Bearer [token]"
+# Respuesta: user.cart = { "id": "cart-id", "products": [...] }
 ```
 
 ### Filtrar y paginar productos

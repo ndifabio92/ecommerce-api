@@ -11,7 +11,7 @@ export class JwtAuthRepository implements IAuthRepository {
   private readonly SALT_ROUNDS = 10;
 
   async login(email: string, password: string): Promise<Auth> {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }).populate("cart");
     if (!user) {
       throw new Error("User not found");
     }
@@ -40,7 +40,7 @@ export class JwtAuthRepository implements IAuthRepository {
         last_name: user.last_name,
         email: user.email,
         age: user.age,
-        cart: user.cart?.toString(),
+        cart: user.cart,
         role: user.role,
       },
     };
@@ -49,7 +49,7 @@ export class JwtAuthRepository implements IAuthRepository {
   async validateToken(token: string): Promise<User | null> {
     try {
       const decoded = jwt.verify(token, this.JWT_SECRET) as any;
-      const user = await UserModel.findById(decoded.id);
+      const user = await UserModel.findById(decoded.id).populate("cart");
       if (!user) return null;
 
       return {
@@ -59,7 +59,7 @@ export class JwtAuthRepository implements IAuthRepository {
         email: user.email,
         age: user.age,
         password: user.password,
-        cart: user.cart?.toString(),
+        cart: user.cart,
         role: user.role,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,

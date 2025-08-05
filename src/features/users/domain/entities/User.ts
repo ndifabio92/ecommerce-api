@@ -1,3 +1,5 @@
+import { Cart } from "../../../cart/domain/entities/Cart";
+
 export interface User {
   id?: string;
   first_name: string;
@@ -5,13 +7,13 @@ export interface User {
   email: string;
   age: number;
   password: string;
-  cart?: string;
+  cart?: string | Cart;
   role: UserRole;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export enum UserRole {
-  USER = "USER",
-  ADMIN = "ADMIN",
+  USER = "user",
+  ADMIN = "admin",
 }

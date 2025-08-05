@@ -10,20 +10,17 @@ export class CreateUserUseCase {
   ) {}
 
   async execute(userData: CreateUserDto): Promise<User> {
-    // Verificar si el email ya existe
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
       throw new Error("Email already exists");
     }
 
-    // Encriptar la contraseña
     const hashedPassword = this.authRepository.hashPassword(userData.password);
 
-    // Crear el usuario con la contraseña encriptada
     const userWithHashedPassword = {
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER, // Usar el rol proporcionado o USER por defecto
+      role: userData.role || UserRole.USER,
     };
     console.log("Creating user:", userWithHashedPassword);
     return await this.userRepository.create(userWithHashedPassword);

@@ -4,7 +4,7 @@ import { CartProduct } from "../entities/CartProduct";
 
 export interface ICartRepository {
   findById(id: string): Promise<Cart | null>;
-  create(): Promise<Cart>;
+  create(userId?: string): Promise<Cart>;
   addProductToCart(
     cartId: string,
     productId: string,

@@ -18,15 +18,13 @@ export class UserController {
   async create(req: Request, res: Response) {
     try {
       const user = await this.createUserUseCase.execute(req.body);
-      // No devolvemos la contraseña en la respuesta
+
       const { password, ...userWithoutPassword } = user;
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "User created successfully",
-          data: userWithoutPassword,
-        });
+      res.status(201).json({
+        success: true,
+        message: "User created successfully",
+        data: userWithoutPassword,
+      });
     } catch (error) {
       if (error instanceof Error && error.message === "Email already exists") {
         httpResponse.badRequest(res, error.message);
@@ -45,7 +43,6 @@ export class UserController {
         return httpResponse.notFound(res, "User not found");
       }
 
-      // No devolvemos la contraseña en la respuesta
       const { password, ...userWithoutPassword } = user;
       httpResponse.success(res, userWithoutPassword);
     } catch (error) {
@@ -56,7 +53,7 @@ export class UserController {
   async getAll(req: Request, res: Response) {
     try {
       const users = await this.getAllUsersUseCase.execute();
-      // No devolvemos las contraseñas en la respuesta
+
       const usersWithoutPasswords = users.map(({ password, ...user }) => user);
       httpResponse.success(res, usersWithoutPasswords);
     } catch (error) {
@@ -73,7 +70,6 @@ export class UserController {
         return httpResponse.notFound(res, "User not found");
       }
 
-      // No devolvemos la contraseña en la respuesta
       const { password, ...userWithoutPassword } = user;
       httpResponse.success(res, userWithoutPassword);
     } catch (error) {
